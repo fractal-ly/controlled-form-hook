@@ -1,6 +1,6 @@
 {
   "name": "controlled-form-hook",
-  "version": "0.5.0",
+  "version": "1.0.2",
   "description": "React hook for handling forms with controlled components",
   "author": "Gustavo Gallegos",
   "license": "MIT",
@@ -21,6 +21,7 @@
     "start": "rollup -c -w",
     "prepare": "yarn run build",
     "predeploy": "cd example && yarn install && yarn run build",
+    "version": "standard-version",
     "deploy": "gh-pages -d example/build"
   },
   "dependencies": {
@@ -55,6 +56,7 @@
     "react-test-renderer": "^17.0.2",
     "rollup": "^2.26.9",
     "rollup-plugin-peer-deps-external": "^2.2.0",
+    "standard-version": "^9.3.1",
     "tslib": "^2.0.1",
     "typescript": "^3.2.4"
   }
