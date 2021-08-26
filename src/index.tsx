@@ -15,6 +15,7 @@ export type UseFormResult<T> = {
   isSubmitting: boolean;
   isDisabled: boolean;
   setValues: (values: T) => void;
+  setErrors: (errors: T) => void;
   reset: (values?: T) => void;
 } & FormState<T>;
 
@@ -153,6 +154,7 @@ const useForm = <T extends {}>({
     ...state,
     isDisabled,
     setValues: setValues(dispatch),
+    setErrors: setErrors(dispatch),
     reset,
   };
 };
