@@ -30,6 +30,7 @@ type FormValues = {
   tos: false;
 };
 
+// ... inside your component
 
 const {
     handleSubmit,
