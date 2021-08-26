@@ -34,7 +34,7 @@ const App = () => {
     visited,
     errors,
     reset,
-  } = useForm<FormValues>({
+  } = useForm<FormValues, string>({
     onSubmit: submit,
     schema: {
       name: [isPresent()],
