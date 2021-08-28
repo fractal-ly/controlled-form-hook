@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { useForm } from '../index';
-import { Validators, Schema } from 'tiny-validation';
+import { useForm, Schema, Validators } from '../index';
 
 const { isPresent, isEmail, isTrue, minChars } = Validators;
 

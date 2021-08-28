@@ -163,3 +163,4 @@ const useForm = <T extends {}, S>({
 };
 
 export { useForm };
+export * from 'tiny-validation';

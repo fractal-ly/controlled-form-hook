@@ -1,7 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import '@testing-library/jest-dom/extend-expect';
-import { useForm } from '../index';
-import { Validators, Schema } from 'tiny-validation';
+import { useForm, Validators, Schema } from '../index';
 
 const { isPresent, isEmail, isTrue, minChars } = Validators;
 

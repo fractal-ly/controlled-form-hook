@@ -1,13 +1,12 @@
 import React from 'react';
 
-import { useForm } from 'controlled-form-hook';
-import { Validators } from 'tiny-validation';
-const { isPresent, isEmail, isTrue, maxChars } = Validators;
+import { useForm, Validators } from 'controlled-form-hook';
 
 type FormValues = {
   name: string;
   email: string;
   password: string;
+  password2: string;
   tos: false;
 };
 
@@ -25,6 +24,7 @@ const submit = async <T extends {}>(values: T) => {
 };
 
 const App = () => {
+  const { isPresent, equals, isEmail, isTrue, maxChars } = Validators;
   const {
     handleSubmit,
     handleFieldChange,
@@ -40,12 +40,14 @@ const App = () => {
       name: [isPresent()],
       email: [isPresent(), isEmail()],
       password: [isPresent(), maxChars(30)],
+      password2: [equals('password')],
       tos: [isTrue()],
     },
     initialValues: {
       name: 'Gustavo',
       email: '',
       password: '',
+      password2: '',
       tos: false,
     },
   });
@@ -80,6 +82,20 @@ const App = () => {
               />
             </div>
             {visited['password'] && <Error errors={errors['password']} />}
+
+            <div className="inputfield">
+              <label htmlFor="password2" className="inputlabel">
+                Password
+              </label>
+              <input
+                id="password2"
+                name="password2"
+                type="text"
+                value={values['password2']}
+                onChange={handleFieldChange}
+              />
+            </div>
+            {visited['password2'] && <Error errors={errors['password2']} />}
 
             <div className="inputfield">
               <label htmlFor="email" className="inputlabel">

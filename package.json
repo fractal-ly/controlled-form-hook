@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "immer": "^9.0.5",
-    "tiny-validation": "1.0.10"
+    "tiny-validation": "^1.1.2"
   },
   "peerDependencies": {
     "react": "^17.0.2"

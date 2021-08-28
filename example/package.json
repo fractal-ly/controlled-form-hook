@@ -5,10 +5,10 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "controlled-form-hook": "link:..",
     "react": "link:../node_modules/react",
     "react-dom": "^16.9.0",
-    "react-scripts": "^3.0.1",
-    "controlled-form-hook": "link:.."
+    "react-scripts": "^3.0.1"
   },
   "scripts": {
     "start": "react-scripts start",

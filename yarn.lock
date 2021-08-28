@@ -11440,10 +11440,10 @@ timsort@^0.3.0:
   resolved "https://registry.yarnpkg.com/timsort/-/timsort-0.3.0.tgz#405411a8e7e6339fe64db9a234de11dc31e02bd4"
   integrity sha1-QFQRqOfmM5/mTbmiNN4R3DHgK9Q=
 
-tiny-validation@1.0.10:
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/tiny-validation/-/tiny-validation-1.0.10.tgz#16da21bdddcb920efda284ead009747387bfc6c8"
-  integrity sha512-qn1q7H4XfjF9dYfDOIogULrQqRE3OyZS2kErufUBSSD4LjbiMNaHHme8M/FV6Uek0Wl5lbcnItM+nUWrcrvrnA==
+tiny-validation@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/tiny-validation/-/tiny-validation-1.1.2.tgz#af46c5f91f70e5fb570c717dc4a215d92f83841e"
+  integrity sha512-X3+9x2b9ElMLhyGbYfeTvUykOCrXhOusVSv7Dly1uzYzoMOh0pNmvvr7dsqi2cS2WxCmUy1py4RZVMoRDGbGBQ==
 
 tmp@^0.0.33:
   version "0.0.33"
