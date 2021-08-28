@@ -97,21 +97,21 @@ const initialize = <T extends {}>(
   values: T
 ) => dispatch({ type: Actions.RESET, payload: values });
 
-type UseFormProps<T> = {
-  onSubmit: (formValues: T) => Promise<any>;
+type UseFormProps<T, S> = {
+  onSubmit: (formValues: T) => Promise<S>;
   schema: Schema;
   initialValues: T;
   disabledOverride?: boolean;
   dependencies?: unknown[];
 };
 
-const useForm = <T extends {}>({
+const useForm = <T extends {}, S>({
   onSubmit,
   schema,
   initialValues,
   disabledOverride = false,
   dependencies = [],
-}: UseFormProps<T>): UseFormResult<T> => {
+}: UseFormProps<T, S>): UseFormResult<T> => {
   const stableSchema = React.useMemo(() => schema, dependencies);
   const [state, dispatch] = React.useReducer(
     reducer<T>(),
@@ -132,7 +132,10 @@ const useForm = <T extends {}>({
       return onSubmit(state.values).finally(() => {
         setIsSubmitting(false);
       });
-    } else setIsSubmitting(false);
+    } else {
+      setIsSubmitting(false);
+      return null;
+    }
   };
 
   const handleFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {

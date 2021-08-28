@@ -33,7 +33,7 @@ const schema: Schema = {
 };
 
 function FormExample({ onSubmit }: FormExampleProps) {
-  const result = useForm<FormValues>({
+  const result = useForm<FormValues, boolean>({
     onSubmit,
     schema,
     initialValues: {
