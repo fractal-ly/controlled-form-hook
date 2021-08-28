@@ -118,6 +118,11 @@ const useForm = <T extends {}, S = unknown>({
     getFormState(initialValues)
   );
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const cancelRef = React.useRef(false);
+
+  React.useEffect(() => {
+    () => (cancelRef.current = true);
+  }, []);
 
   React.useEffect(() => {
     validate(stableSchema, state.values).fold(setErrors(dispatch), () =>
@@ -130,7 +135,7 @@ const useForm = <T extends {}, S = unknown>({
     setIsSubmitting(true);
     if (Object.keys(state.errors).length == 0) {
       return onSubmit(state.values).finally(() => {
-        setIsSubmitting(false);
+        if (!cancelRef.current) setIsSubmitting(false);
       });
     } else {
       setIsSubmitting(false);
