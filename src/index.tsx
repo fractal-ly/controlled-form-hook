@@ -105,7 +105,7 @@ type UseFormProps<T, S> = {
   dependencies?: unknown[];
 };
 
-const useForm = <T extends {}, S>({
+const useForm = <T extends {}, S = unknown>({
   onSubmit,
   schema,
   initialValues,
