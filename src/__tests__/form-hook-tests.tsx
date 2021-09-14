@@ -1,6 +1,12 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import '@testing-library/jest-dom/extend-expect';
-import { useForm, Validators, Schema } from '../index';
+import {
+  useForm,
+  Validators,
+  Schema,
+  createChangeEvent,
+  DatePickerTarget,
+} from '../index';
 
 const { isPresent, isEmail, isTrue, minChars } = Validators;
 
@@ -17,11 +23,15 @@ const fakeEvent = (target: Target) =>
     persist: () => null,
   } as unknown as React.ChangeEvent<HTMLInputElement>);
 
+const DateOne = new Date();
+const DateTwo = new Date('1/1/1980');
+
 type FormValues = {
   name: string;
   password: string;
   email: string;
   tos: boolean;
+  todaysDate: Date | undefined;
 };
 
 const ERRORS = [
@@ -45,12 +55,14 @@ const onSubmit = async (values: FormValues) => {
   return true;
 };
 
-const initialValues = {
+const initialValues: FormValues = {
   name: 'Filiberto',
   email: '',
   password: '',
+  todaysDate: undefined,
   tos: false,
 };
+
 const initialErrors = {
   email: ['ERROR_EMAIL_NOT_PRESENT', 'ERROR_EMAIL_BAD_FORMAT'],
   password: ['ERROR_PWD_NOT_PRESENT', 'ERROR_PWD_TOO_SHORT'],
@@ -134,11 +146,22 @@ test('Form initializes correctly', async () => {
     )
   );
 
+  act(() =>
+    result.current.handleFieldChange(
+      createChangeEvent<DatePickerTarget>({
+        name: 'todaysDate',
+        value: DateTwo,
+        type: 'datepicker',
+      })
+    )
+  );
+
   expect(result.current.errors).toEqual({});
   expect(result.current.visited).toEqual({
     name: true,
     email: true,
     password: true,
+    todaysDate: true,
     tos: true,
   });
   expect(result.current.isDisabled).toBe(false);
@@ -148,6 +171,7 @@ test('Form initializes correctly', async () => {
     password: '12312312122',
     tos: true,
     email: 'email@here.com',
+    todaysDate: DateTwo,
   });
 });
 
@@ -166,6 +190,7 @@ test('user can set form values', async () => {
       password: '12312312122',
       tos: true,
       email: 'email@here.com',
+      todaysDate: DateOne,
     })
   );
 
@@ -176,6 +201,7 @@ test('user can set form values', async () => {
     name: 'gustavo',
     password: '12312312122',
     tos: true,
+    todaysDate: DateOne,
     email: 'email@here.com',
   });
 });
@@ -196,6 +222,7 @@ test('user can successfuly submitform', async () => {
         password: '12312312122',
         tos: true,
         email: 'email@here.com',
+        todaysDate: DateOne,
       },
     },
   });
@@ -212,6 +239,7 @@ test('user can successfuly submitform', async () => {
   expect(result.current.values).toEqual({
     name: 'gustavo',
     password: '12312312122',
+    todaysDate: DateOne,
     tos: true,
     email: 'email@here.com',
   });
@@ -220,6 +248,7 @@ test('user can successfuly submitform', async () => {
     name: 'gustavo',
     password: '12312312122',
     tos: true,
+    todaysDate: DateOne,
     email: 'email@here.com',
   });
 });
@@ -240,7 +269,8 @@ test('user can reset form to initial values', async () => {
         password: '12312312122',
         tos: true,
         email: 'email@here.com',
-      },
+        todaysDate: DateOne,
+      } as FormValues,
     },
   });
 
@@ -257,6 +287,7 @@ test('user can reset form to initial values', async () => {
     name: 'gustavo',
     password: '12312312122',
     tos: true,
+    todaysDate: DateOne,
     email: 'email@here.com',
   });
   expect(result.current.isDisabled).toBe(false);
@@ -283,6 +314,7 @@ test('user can reset form to new values', async () => {
       password: '12312312122',
       tos: true,
       email: 'email@here.com',
+      todaysDate: DateTwo,
     })
   );
 
@@ -292,6 +324,7 @@ test('user can reset form to new values', async () => {
     password: '12312312122',
     tos: true,
     email: 'email@here.com',
+    todaysDate: DateTwo,
   });
   expect(result.current.isDisabled).toBe(false);
 });

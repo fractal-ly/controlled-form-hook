@@ -2,6 +2,23 @@ import * as React from 'react';
 import { Schema, validate } from 'tiny-validation';
 import { produce, castDraft } from 'immer';
 
+type InputTarget = EventTarget & HTMLInputElement;
+
+export type DatePickerTarget = {
+  name: string;
+  type: 'datepicker';
+  value: Date;
+};
+
+type Target = InputTarget | DatePickerTarget;
+
+export type SimulatedChangeEvent<T extends Target> = {
+  target: T;
+  persist: undefined;
+};
+
+type ChangeEvent = SimulatedChangeEvent<DatePickerTarget>;
+
 type FormState<T> = {
   values: T;
   errors: Record<string, string[]>;
@@ -10,7 +27,9 @@ type FormState<T> = {
 };
 
 export type UseFormResult<T> = {
-  handleFieldChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleFieldChange: (
+    event: React.ChangeEvent<HTMLInputElement> | ChangeEvent
+  ) => void;
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<any>;
   isSubmitting: boolean;
   isDisabled: boolean;
@@ -37,7 +56,7 @@ type Action<T> =
     }
   | {
       type: Actions.CHANGE;
-      payload: EventTarget & HTMLInputElement;
+      payload: Target;
     }
   | {
       type: Actions.RESET;
@@ -46,26 +65,23 @@ type Action<T> =
 
 function reducer<T>() {
   return produce<FormState<T>, [Action<T>]>((draft, action) => {
-    const { type, payload } = action;
-    switch (type) {
-      case Actions.VALUES:
-        draft.values = castDraft(payload as T);
-        break;
-      case Actions.ERRORS:
-        draft.errors = payload as Record<string, string[]>;
-        draft.hasErrors = Object.keys(draft.errors).length !== 0;
-        break;
-      case Actions.CHANGE:
-        const { name, type, value, checked } = payload as EventTarget &
-          HTMLInputElement;
-        draft.values[name] = type === 'checkbox' ? checked : value;
-        draft.visited[name] = true;
-        break;
-      case Actions.RESET:
-        draft.visited = {};
-        draft.errors = {};
-        draft.values = castDraft(payload as T);
-        break;
+    if (action.type === Actions.VALUES) {
+      draft.values = castDraft(action.payload);
+    } else if (action.type === Actions.ERRORS) {
+      draft.errors = castDraft(action.payload);
+      draft.hasErrors = Object.keys(draft.errors).length !== 0;
+    } else if (action.type === Actions.RESET) {
+      draft.visited = {};
+      draft.errors = {};
+      draft.values = castDraft(action.payload);
+    } else if (action.type === Actions.CHANGE) {
+      const { name } = action.payload;
+      if (action.payload.type === 'checkbox') {
+        draft.values[name] = action.payload.checked;
+      } else {
+        draft.values[name] = action.payload.value;
+      }
+      draft.visited[name] = true;
     }
   });
 }
@@ -84,7 +100,7 @@ const setErrors =
 
 const changeValue = <T extends {}>(
   dispatch: React.Dispatch<Action<T>>,
-  target: EventTarget & HTMLInputElement
+  target: Target
 ) => dispatch({ type: Actions.CHANGE, payload: target });
 
 const setValues =
@@ -143,8 +159,10 @@ const useForm = <T extends {}, S = unknown>({
     }
   };
 
-  const handleFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.persist();
+  const handleFieldChange = (
+    event: React.ChangeEvent<HTMLInputElement> | ChangeEvent
+  ) => {
+    event.persist?.();
     changeValue(dispatch, event.target);
   };
 
@@ -167,5 +185,12 @@ const useForm = <T extends {}, S = unknown>({
   };
 };
 
-export { useForm };
+const createChangeEvent = <T extends Target>(
+  target: T
+): SimulatedChangeEvent<T> => ({
+  persist: undefined,
+  target,
+});
+
+export { useForm, createChangeEvent };
 export * from 'tiny-validation';
