@@ -18,6 +18,7 @@ export type SimulatedChangeEvent<T extends Target> = {
 };
 
 type ChangeEvent = SimulatedChangeEvent<DatePickerTarget>;
+export type DatePickerChangeEvent = SimulatedChangeEvent<DatePickerTarget>;
 
 type FormState<T> = {
   values: T;
@@ -136,9 +137,12 @@ const useForm = <T extends {}, S = unknown>({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const cancelRef = React.useRef(false);
 
-  React.useEffect(() => {
-    () => (cancelRef.current = true);
-  }, []);
+  React.useEffect(
+    () => () => {
+      cancelRef.current = true;
+    },
+    []
+  );
 
   React.useEffect(() => {
     validate(stableSchema, state.values).fold(setErrors(dispatch), () =>
