@@ -10,7 +10,18 @@ export type DatePickerTarget = {
   value: Date;
 };
 
-type Target = InputTarget | DatePickerTarget;
+type DateRange = {
+    from: Date | undefined;
+    to?: Date | undefined;
+}
+
+export type DateRangePickerTarget = {
+  name: string;
+  type: 'daterangepicker';
+  value: DateRange;
+};
+
+type Target = InputTarget | DatePickerTarget | DateRangePickerTarget;
 
 export type SimulatedChangeEvent<T extends Target> = {
   target: T;
