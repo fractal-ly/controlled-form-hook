@@ -5,7 +5,7 @@ import {
   Validators,
   Schema,
   createChangeEvent,
-  DatePickerTarget,
+  CustomTarget,
 } from '../index';
 
 const { isPresent, isEmail, isTrue, minChars } = Validators;
@@ -148,7 +148,7 @@ test('Form initializes correctly', async () => {
 
   act(() =>
     result.current.handleFieldChange(
-      createChangeEvent<DatePickerTarget>({
+      createChangeEvent<CustomTarget>({
         name: 'todaysDate',
         value: DateTwo,
         type: 'datepicker',

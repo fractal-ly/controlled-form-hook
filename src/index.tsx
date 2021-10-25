@@ -4,21 +4,20 @@ import { produce, castDraft } from 'immer';
 
 type InputTarget = EventTarget & HTMLInputElement;
 
-export type DatePickerTarget = {
+export interface CustomTarget {
   name: string;
-  type: 'datepicker';
-  value: Date;
-};
+  type: string;
+  value: unknown;
+}
 
-type Target = InputTarget | DatePickerTarget;
+type Target = InputTarget | CustomTarget;
 
 export type SimulatedChangeEvent<T extends Target> = {
   target: T;
   persist: undefined;
 };
 
-type ChangeEvent = SimulatedChangeEvent<DatePickerTarget>;
-export type DatePickerChangeEvent = SimulatedChangeEvent<DatePickerTarget>;
+export type ChangeEvent = SimulatedChangeEvent<CustomTarget>;
 
 type FormState<T> = {
   values: T;
@@ -78,7 +77,8 @@ function reducer<T>() {
     } else if (action.type === Actions.CHANGE) {
       const { name } = action.payload;
       if (action.payload.type === 'checkbox') {
-        draft.values[name] = action.payload.checked;
+        const payload = action.payload as InputTarget;
+        draft.values[name] = payload.checked;
       } else {
         draft.values[name] = action.payload.value;
       }
