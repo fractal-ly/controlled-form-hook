@@ -21,26 +21,26 @@ const ERRORS = [
   'ERROR_EMAIL_BAD_FORMAT',
   'ERROR_PWD_NOT_PRESENT',
   'ERROR_PWD_TOO_SHORT',
-  'ERROR_TOS_UNCHECKED',
+  'ERROR_TOS_UNCHECKED'
 ];
 
-const schema: Schema = {
+const stableSchema: Schema = {
   name: [isPresent(ERRORS[0])],
   email: [isPresent(ERRORS[1]), isEmail(ERRORS[2])],
   password: [isPresent(ERRORS[3]), minChars(8, ERRORS[4])],
-  tos: [isTrue(ERRORS[5])],
+  tos: [isTrue(ERRORS[5])]
 };
 
 function FormExample({ onSubmit }: FormExampleProps) {
   const result = useForm<FormValues, boolean>({
     onSubmit,
-    schema,
+    stableSchema,
     initialValues: {
       name: 'Filiberto',
       email: '',
       password: '',
-      tos: false,
-    },
+      tos: false
+    }
   });
 
   return (
@@ -100,16 +100,16 @@ test('Form initializes correctly', async () => {
   const submitButton = screen.getByRole('button', { name: /submit/i });
   const resetButton = screen.getByRole('button', { name: /reset/i });
   const nameInput = screen.getByRole('textbox', {
-    name: /name/i,
+    name: /name/i
   }) as HTMLInputElement;
   const passwordInput = screen.getByRole('textbox', {
-    name: /password/i,
+    name: /password/i
   }) as HTMLInputElement;
   const emailInput = screen.getByRole('textbox', {
-    name: /email/i,
+    name: /email/i
   }) as HTMLInputElement;
   const tosInput = screen.getByRole('checkbox', {
-    name: /terms of service/i,
+    name: /terms of service/i
   }) as HTMLInputElement;
 
   expect(submitButton).toBeDisabled();
@@ -129,7 +129,7 @@ test('Form initializes correctly', async () => {
     'ERROR_EMAIL_BAD_FORMAT',
     'ERROR_PWD_NOT_PRESENT',
     'ERROR_PWD_TOO_SHORT',
-    'ERROR_TOS_UNCHECKED',
+    'ERROR_TOS_UNCHECKED'
   ]) {
     expect(messages.includes(error)).toBe(true);
   }
