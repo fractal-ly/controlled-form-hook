@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.3](https://github.com/fractal-ly/controlled-form-hook/compare/v2.0.1...v2.0.3) (2023-07-18)
+
 ### [2.0.1](https://github.com/fractal-ly/controlled-form-hook/compare/v1.0.24...v2.0.1) (2023-07-18)
 
 ### [1.0.24](https://github.com/fractal-ly/controlled-form-hook/compare/v1.0.22...v1.0.24) (2021-10-25)
