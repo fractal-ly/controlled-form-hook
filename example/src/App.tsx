@@ -1,6 +1,6 @@
 import React from 'react';
-
 import { useForm, Validators } from 'controlled-form-hook';
+const { isPresent, equals, isEmail, isTrue, maxChars } = Validators;
 
 type FormValues = {
   name: string;
@@ -23,8 +23,15 @@ const submit = async <T extends {}>(values: T) => {
   return 'This is your sumit result';
 };
 
+const stableSchema = {
+  name: [isPresent()],
+  email: [isPresent(), isEmail()],
+  password: [isPresent(), maxChars(30)],
+  password2: [equals('password')],
+  tos: [isTrue()]
+};
+
 const App = () => {
-  const { isPresent, equals, isEmail, isTrue, maxChars } = Validators;
   const {
     handleSubmit,
     handleFieldChange,
@@ -33,23 +40,17 @@ const App = () => {
     values,
     visited,
     errors,
-    reset,
+    reset
   } = useForm<FormValues>({
     onSubmit: submit,
-    schema: {
-      name: [isPresent()],
-      email: [isPresent(), isEmail()],
-      password: [isPresent(), maxChars(30)],
-      password2: [equals('password')],
-      tos: [isTrue()],
-    },
+    stableSchema,
     initialValues: {
       name: 'Gustavo',
       email: '',
       password: '',
       password2: '',
-      tos: false,
-    },
+      tos: false
+    }
   });
   return (
     <div className="main">
