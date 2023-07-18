@@ -5,7 +5,7 @@ import {
   Validators,
   Schema,
   createChangeEvent,
-  CustomTarget,
+  CustomTarget
 } from '../index';
 
 const { isPresent, isEmail, isTrue, minChars } = Validators;
@@ -20,7 +20,7 @@ type Target = {
 const fakeEvent = (target: Target) =>
   ({
     target,
-    persist: () => null,
+    persist: () => null
   } as unknown as React.ChangeEvent<HTMLInputElement>);
 
 const DateOne = new Date();
@@ -40,14 +40,14 @@ const ERRORS = [
   'ERROR_EMAIL_BAD_FORMAT',
   'ERROR_PWD_NOT_PRESENT',
   'ERROR_PWD_TOO_SHORT',
-  'ERROR_TOS_UNCHECKED',
+  'ERROR_TOS_UNCHECKED'
 ];
 
-const schema: Schema = {
+const stableSchema: Schema = {
   name: [isPresent(ERRORS[0])],
   email: [isPresent(ERRORS[1]), isEmail(ERRORS[2])],
   password: [isPresent(ERRORS[3]), minChars(8, ERRORS[4])],
-  tos: [isTrue(ERRORS[5])],
+  tos: [isTrue(ERRORS[5])]
 };
 
 const onSubmit = async (values: FormValues) => {
@@ -60,26 +60,26 @@ const initialValues: FormValues = {
   email: '',
   password: '',
   todaysDate: undefined,
-  tos: false,
+  tos: false
 };
 
 const initialErrors = {
   email: ['ERROR_EMAIL_NOT_PRESENT', 'ERROR_EMAIL_BAD_FORMAT'],
   password: ['ERROR_PWD_NOT_PRESENT', 'ERROR_PWD_TOO_SHORT'],
-  tos: ['ERROR_TOS_UNCHECKED'],
+  tos: ['ERROR_TOS_UNCHECKED']
 };
 
 test('Form initializes correctly', async () => {
   const { result } = renderHook(useForm, {
     initialProps: {
       onSubmit,
-      schema,
-      initialValues,
-    },
+      stableSchema,
+      initialValues
+    }
   });
 
   const errorState: Partial<typeof initialErrors> = {
-    ...initialErrors,
+    ...initialErrors
   };
 
   expect(result.current.isDisabled).toBe(true);
@@ -109,7 +109,7 @@ test('Form initializes correctly', async () => {
   expect(result.current.values).toEqual({
     ...initialValues,
     name: 'gustavo',
-    email: 'email@here.com',
+    email: 'email@here.com'
   });
 
   delete errorState.email;
@@ -129,7 +129,7 @@ test('Form initializes correctly', async () => {
   expect(result.current.visited).toEqual({
     name: true,
     email: true,
-    password: true,
+    password: true
   });
   expect(result.current.isDisabled).toBe(true);
   expect(result.current.isSubmitting).toBe(false);
@@ -151,7 +151,7 @@ test('Form initializes correctly', async () => {
       createChangeEvent<CustomTarget>({
         name: 'todaysDate',
         value: DateTwo,
-        type: 'datepicker',
+        type: 'datepicker'
       })
     )
   );
@@ -162,7 +162,7 @@ test('Form initializes correctly', async () => {
     email: true,
     password: true,
     todaysDate: true,
-    tos: true,
+    tos: true
   });
   expect(result.current.isDisabled).toBe(false);
   expect(result.current.isSubmitting).toBe(false);
@@ -171,7 +171,7 @@ test('Form initializes correctly', async () => {
     password: '12312312122',
     tos: true,
     email: 'email@here.com',
-    todaysDate: DateTwo,
+    todaysDate: DateTwo
   });
 });
 
@@ -179,9 +179,9 @@ test('user can set form values', async () => {
   const { result } = renderHook(useForm, {
     initialProps: {
       onSubmit,
-      schema,
-      initialValues,
-    },
+      stableSchema,
+      initialValues
+    }
   });
 
   act(() =>
@@ -190,7 +190,7 @@ test('user can set form values', async () => {
       password: '12312312122',
       tos: true,
       email: 'email@here.com',
-      todaysDate: DateOne,
+      todaysDate: DateOne
     })
   );
 
@@ -202,7 +202,7 @@ test('user can set form values', async () => {
     password: '12312312122',
     tos: true,
     todaysDate: DateOne,
-    email: 'email@here.com',
+    email: 'email@here.com'
   });
 });
 
@@ -216,22 +216,22 @@ test('user can successfuly submitform', async () => {
   const { result } = renderHook(useForm, {
     initialProps: {
       onSubmit,
-      schema,
+      stableSchema,
       initialValues: {
         name: 'gustavo',
         password: '12312312122',
         tos: true,
         email: 'email@here.com',
-        todaysDate: DateOne,
-      },
-    },
+        todaysDate: DateOne
+      }
+    }
   });
 
-  await act(() =>
+  await act(async () => {
     result.current.handleSubmit({
-      preventDefault: () => null,
-    } as unknown as React.FormEvent<HTMLFormElement>)
-  );
+      preventDefault: () => null
+    } as unknown as React.FormEvent<HTMLFormElement>);
+  });
 
   expect(result.current.errors).toEqual({});
   expect(result.current.isDisabled).toBe(false);
@@ -241,7 +241,7 @@ test('user can successfuly submitform', async () => {
     password: '12312312122',
     todaysDate: DateOne,
     tos: true,
-    email: 'email@here.com',
+    email: 'email@here.com'
   });
   expect(submit).toBeCalledTimes(1);
   expect(submit).toBeCalledWith({
@@ -249,7 +249,7 @@ test('user can successfuly submitform', async () => {
     password: '12312312122',
     tos: true,
     todaysDate: DateOne,
-    email: 'email@here.com',
+    email: 'email@here.com'
   });
 });
 
@@ -263,15 +263,15 @@ test('user can reset form to initial values', async () => {
   const { result } = renderHook(useForm, {
     initialProps: {
       onSubmit,
-      schema,
+      stableSchema,
       initialValues: {
         name: 'gustavo',
         password: '12312312122',
         tos: true,
         email: 'email@here.com',
-        todaysDate: DateOne,
-      } as FormValues,
-    },
+        todaysDate: DateOne
+      } as FormValues
+    }
   });
 
   act(() => result.current.setValues(initialValues));
@@ -288,7 +288,7 @@ test('user can reset form to initial values', async () => {
     password: '12312312122',
     tos: true,
     todaysDate: DateOne,
-    email: 'email@here.com',
+    email: 'email@here.com'
   });
   expect(result.current.isDisabled).toBe(false);
 });
@@ -303,9 +303,9 @@ test('user can reset form to new values', async () => {
   const { result } = renderHook(useForm, {
     initialProps: {
       onSubmit,
-      schema,
-      initialValues,
-    },
+      stableSchema,
+      initialValues
+    }
   });
 
   act(() =>
@@ -314,7 +314,7 @@ test('user can reset form to new values', async () => {
       password: '12312312122',
       tos: true,
       email: 'email@here.com',
-      todaysDate: DateTwo,
+      todaysDate: DateTwo
     })
   );
 
@@ -324,7 +324,7 @@ test('user can reset form to new values', async () => {
     password: '12312312122',
     tos: true,
     email: 'email@here.com',
-    todaysDate: DateTwo,
+    todaysDate: DateTwo
   });
   expect(result.current.isDisabled).toBe(false);
 });
