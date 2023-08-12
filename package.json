@@ -1,6 +1,6 @@
 {
   "name": "controlled-form-hook",
-  "version": "2.0.9",
+  "version": "2.0.11",
   "description": "React hook for handling forms with controlled components",
   "author": "Gustavo Gallegos",
   "license": "MIT",
