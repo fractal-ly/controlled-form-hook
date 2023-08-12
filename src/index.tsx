@@ -150,8 +150,12 @@ const useForm = <T extends Record<string, unknown>, S = unknown>({
   initialValues,
   disabledOverride = false
 }: UseFormProps<T, S>): UseFormResult<T> => {
+  const wrappedReducer = React.useCallback(
+    (state: FormState<T>, action: Action<T>) => reducer(state, action),
+    []
+  );
   const [state, dispatch] = React.useReducer(
-    reducer<T>,
+    wrappedReducer,
     getFormState(initialValues)
   );
   const [isSubmitting, setIsSubmitting] = useSafeState(false);
