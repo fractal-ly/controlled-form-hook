@@ -6,7 +6,7 @@ type InputTarget = EventTarget & HTMLInputElement;
 
 export interface CustomTarget {
   name: string;
-  type: string;
+  type?: string;
   value: unknown;
 }
 
@@ -26,20 +26,6 @@ type FormState<T> = {
   hasErrors: boolean;
 };
 
-export type UseFormResult<T> = {
-  handleFieldChange: (
-    event: React.ChangeEvent<HTMLInputElement> | ChangeEvent
-  ) => void;
-  handleChange: (...args: string[]) => any;
-  handleSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<unknown>;
-  isSubmitting: boolean;
-  isDisabled: boolean;
-  setValues: (values: T) => void;
-  setErrors: (errors: Record<string, string[]>) => void;
-  reset: (values?: T) => void;
-  isFieldVisited: (fielName: string) => boolean;
-} & FormState<T>;
-
 enum Actions {
   VALUES = 'set_values',
   ERRORS = 'set_errors',
@@ -48,30 +34,15 @@ enum Actions {
 }
 
 type Action<T> =
-  | {
-      type: Actions.VALUES;
-      payload: T;
-    }
-  | {
-      type: Actions.ERRORS;
-      payload: Record<string, string[]>;
-    }
-  | {
-      type: Actions.CHANGE;
-      payload: Target;
-    }
-  | {
-      type: Actions.RESET;
-      payload: T;
-    };
+  | { type: Actions.VALUES; payload: T }
+  | { type: Actions.ERRORS; payload: Record<string, string[]> }
+  | { type: Actions.CHANGE; payload: Target }
+  | { type: Actions.RESET; payload: T };
 
 function reducer<T>(state: FormState<T>, action: Action<T>): FormState<T> {
   switch (action.type) {
     case Actions.VALUES:
-      return {
-        ...state,
-        values: action.payload
-      };
+      return { ...state, values: action.payload };
 
     case Actions.ERRORS:
       return {
@@ -95,14 +66,8 @@ function reducer<T>(state: FormState<T>, action: Action<T>): FormState<T> {
 
       return {
         ...state,
-        values: {
-          ...state.values,
-          [name]: newValue
-        },
-        visited: {
-          ...state.visited,
-          [name]: true
-        }
+        values: { ...state.values, [name]: newValue },
+        visited: { ...state.visited, [name]: true }
       };
     }
 
@@ -149,7 +114,7 @@ const useForm = <T extends Record<string, unknown>, S = unknown>({
   stableSchema,
   initialValues,
   disabledOverride = false
-}: UseFormProps<T, S>): UseFormResult<T> => {
+}: UseFormProps<T, S>) => {
   const wrappedReducer = React.useCallback(
     (state: FormState<T>, action: Action<T>) => reducer(state, action),
     []
