@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Schema, validate } from 'tiny-validation';
-import { produce, castDraft } from 'immer';
 import { useSafeState } from './hooks/useSafeState';
 
 type InputTarget = EventTarget & HTMLInputElement;
@@ -31,6 +30,7 @@ export type UseFormResult<T> = {
   handleFieldChange: (
     event: React.ChangeEvent<HTMLInputElement> | ChangeEvent
   ) => void;
+  handleChange: (...args: string[]) => any;
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<unknown>;
   isSubmitting: boolean;
   isDisabled: boolean;
@@ -54,7 +54,7 @@ type Action<T> =
     }
   | {
       type: Actions.ERRORS;
-      payload: Record<string, readonly string[]>;
+      payload: Record<string, string[]>;
     }
   | {
       type: Actions.CHANGE;
@@ -65,34 +65,53 @@ type Action<T> =
       payload: T;
     };
 
-function reducer<T>() {
-  return produce<FormState<T>, [Action<T>]>((draft, action) => {
-    if (action.type === Actions.VALUES) {
-      draft.values = castDraft(action.payload);
-    } else if (action.type === Actions.ERRORS) {
-      draft.errors = castDraft(action.payload);
-      draft.hasErrors = Object.keys(draft.errors).length !== 0;
-    } else if (action.type === Actions.RESET) {
-      draft.visited = {};
-      draft.errors = {};
-      draft.values = castDraft(action.payload);
-      draft.hasErrors = false;
-    } else if (action.type === Actions.CHANGE) {
-      const { name } = action.payload;
-      if (action.payload.type === 'checkbox') {
-        const payload = action.payload as InputTarget;
-        draft.values[name] = payload.checked;
-      } else {
-        draft.values[name] = action.payload.value;
-      }
-      draft.visited[name] = true;
+function reducer<T>(state: FormState<T>, action: Action<T>): FormState<T> {
+  switch (action.type) {
+    case Actions.VALUES:
+      return {
+        ...state,
+        values: action.payload
+      };
+
+    case Actions.ERRORS:
+      return {
+        ...state,
+        errors: action.payload,
+        hasErrors: Object.keys(action.payload).length !== 0
+      };
+
+    case Actions.RESET:
+      return {
+        values: action.payload,
+        errors: {},
+        visited: {},
+        hasErrors: false
+      };
+
+    case Actions.CHANGE: {
+      const { name, type, value } = action.payload;
+      const newValue =
+        type === 'checkbox' ? (action.payload as InputTarget).checked : value;
+
+      return {
+        ...state,
+        values: {
+          ...state.values,
+          [name]: newValue
+        },
+        visited: {
+          ...state.visited,
+          [name]: true
+        }
+      };
     }
-  });
+
+    default:
+      return state;
+  }
 }
 
-const getFormState = <T extends Record<string, unknown>>(
-  values: T | (() => T)
-): FormState<T> => ({
+const getFormState = <T,>(values: T | (() => T)): FormState<T> => ({
   values: values instanceof Function ? values() : values,
   errors: {},
   visited: {},
@@ -100,24 +119,23 @@ const getFormState = <T extends Record<string, unknown>>(
 });
 
 const setErrors =
-  <T extends Record<string, unknown>>(dispatch: React.Dispatch<Action<T>>) =>
+  <T,>(dispatch: React.Dispatch<Action<T>>) =>
   (value: Record<string, readonly string[]>) =>
-    dispatch({ type: Actions.ERRORS, payload: value });
+    dispatch({
+      type: Actions.ERRORS,
+      payload: value as Record<string, string[]>
+    });
 
-const changeValue = <T extends Record<string, unknown>>(
-  dispatch: React.Dispatch<Action<T>>,
-  target: Target
-) => dispatch({ type: Actions.CHANGE, payload: target });
+const changeValue = <T,>(dispatch: React.Dispatch<Action<T>>, target: Target) =>
+  dispatch({ type: Actions.CHANGE, payload: target });
 
 const setValues =
-  <T extends Record<string, unknown>>(dispatch: React.Dispatch<Action<T>>) =>
+  <T,>(dispatch: React.Dispatch<Action<T>>) =>
   (values: T) =>
     dispatch({ type: Actions.VALUES, payload: values });
 
-const initialize = <T extends Record<string, unknown>>(
-  dispatch: React.Dispatch<Action<T>>,
-  values: T
-) => dispatch({ type: Actions.RESET, payload: values });
+const initialize = <T,>(dispatch: React.Dispatch<Action<T>>, values: T) =>
+  dispatch({ type: Actions.RESET, payload: values });
 
 type UseFormProps<T, S> = {
   onSubmit: (formValues: T, ...args: unknown[]) => Promise<S>;
@@ -133,7 +151,7 @@ const useForm = <T extends Record<string, unknown>, S = unknown>({
   disabledOverride = false
 }: UseFormProps<T, S>): UseFormResult<T> => {
   const [state, dispatch] = React.useReducer(
-    reducer<T>(),
+    reducer<T>,
     getFormState(initialValues)
   );
   const [isSubmitting, setIsSubmitting] = useSafeState(false);
@@ -160,6 +178,15 @@ const useForm = <T extends Record<string, unknown>, S = unknown>({
     }
   };
 
+  // useful for applications that use react-aria
+  const handleChange = curry((fieldName: string, value: string) =>
+    changeValue(dispatch, {
+      name: fieldName,
+      type: 'input',
+      value: value
+    })
+  );
+
   const handleFieldChange = (
     event: React.ChangeEvent<HTMLInputElement> | ChangeEvent
   ) => {
@@ -180,6 +207,7 @@ const useForm = <T extends Record<string, unknown>, S = unknown>({
 
   return {
     handleFieldChange,
+    handleChange,
     handleSubmit,
     isSubmitting,
     isFieldVisited,
@@ -197,6 +225,17 @@ const createChangeEvent = <T extends Target>(
   persist: undefined,
   target
 });
+
+const curry = <F extends (...args: any[]) => any>(
+  fn: F
+): ((...args: any[]) => any) => {
+  return (...args: any[]) => {
+    if (fn.length <= args.length) {
+      return fn(...args);
+    }
+    return curry(fn.bind(null, ...args));
+  };
+};
 
 export { useForm, createChangeEvent };
 export * from 'tiny-validation';
